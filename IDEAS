@@ -1,0 +1,14 @@
+
+Command-line program called "anagram".
+Input: a word or phrase.
+Output: a list of anagrams, separated by newlines.
+
+Command-line argument ideas:
+	anagram --almost <#>
+		Allow solutions with up to # unused letters.
+	anagram --brute
+		Solve using a brute-force style algorithm
+
+It turns out that there is a data structure specifically designed for solving
+anagrams. Its called "Anatree": https://en.wikipedia.org/wiki/Anatree
+

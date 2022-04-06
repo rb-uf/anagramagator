@@ -1,0 +1,4 @@
+
+I copied 'dict' from my Debian Linux installation
+(/usr/share/dict/american-english). According to wc it has 102774 words,
+separated by newlines. -RB
