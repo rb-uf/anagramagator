@@ -10,6 +10,7 @@
 #include "util.h"
 #include "brute.h"
 #include "filterAlg.h"
+#include "anatree.h"
 using namespace std;
 
 void loadDict(vector<string>& dict);
@@ -19,10 +20,11 @@ int main(int argc, char const *argv[])
 {
 	vector<string> dict;
 	loadDict(dict);
+    Anatree anatree(dict);
 
 	string input;
 	while (getline(cin, input))
-		findSolutions(input, dict);
+		anatree.printAnagramPhrases(input);
 
     return 0;
 }
