@@ -13,7 +13,6 @@
 #include <set>
 #include <cctype>
 #include <climits>
-#include <algorithm>
 #include "util.h"
 using namespace std;
 
@@ -26,19 +25,13 @@ private:
 
     Anatree(string charList);  /* for adding nodes internally */
     void addToAnatree(string word);
-    void printAnatreeRecur(Anatree *a);
-    void printAnagramPhrasesRecur(Anatree *currLocation,
-        string partialSolution, vector<int> remaining);
-    void printAnagramPhrases2Recur(Anatree *prevLocation,
+    void printAnagramPhrasesRecur(Anatree *prevLocation,
         Anatree *currLocation, string partSolution, vector<int> remaining);
     bool alreadyProcessed(Anatree *current, Anatree *mark);
 
 public:
     Anatree(set<string> &dict);
-    void printAnagramWords(string word);
-    void printAnatree();
     void printAnagramPhrases(string input);
-    void printAnagramPhrases2(string input);
 };
 
 
@@ -97,68 +90,6 @@ Anatree::Anatree(set<string> &dict)
         addToAnatree(word);
 }
 
-/* printAnagramWords: prints all single words that are complete anagrams of
-    the given word */
-void Anatree::printAnagramWords(string word)
-{
-    vector<int> remaining = countLetters(word);
-    Anatree *currentNode = this;
-
-    for (int i = 0; i < 26; ) {
-        if (remaining[i] > 0) {
-            if (currentNode->links[i] == NULL)
-                return; /* no anagrams found */
-            currentNode = currentNode->links[i];
-            remaining[i] -= 1;
-        } else {
-            i += 1;
-        }
-    }
-
-    for (string word : currentNode->words)
-        cout << word << endl;
-}
-
-
-void Anatree::printAnagramPhrases(string input)
-{
-    vector<int> remaining = countLetters(input);
-    printAnagramPhrasesRecur(this, "", remaining);
-}
-void Anatree::printAnagramPhrasesRecur(Anatree *currLocation,
-    string partialSolution, vector<int> remaining)
-{
-    bool complete = true;
-    bool endOfPath = true;
-
-    for (int i = 0; i < 26; i++) {
-        if (remaining[i] > 0) {
-            complete = false;
-            if (currLocation->links[i] != NULL) {
-                endOfPath = false;
-                vector<int> v = remaining;
-                v[i] -= 1;
-                printAnagramPhrasesRecur(currLocation->links[i],
-                    partialSolution, v);
-            }
-        }
-    }
-
-    string s;
-    if (endOfPath) {
-        for (string word : currLocation->words) {
-            s = partialSolution;
-            if (partialSolution != "")
-                s.append(" ");
-            s.append(word);
-            if (complete)
-                cout << s << endl;
-            else
-                printAnagramPhrasesRecur(this, s, remaining);
-        }
-    }
-}
-
 bool Anatree::alreadyProcessed(Anatree *current, Anatree *mark)
 {
     if (mark == NULL) {
@@ -172,12 +103,12 @@ bool Anatree::alreadyProcessed(Anatree *current, Anatree *mark)
     }
 }
 
-void Anatree::printAnagramPhrases2(string input)
+void Anatree::printAnagramPhrases(string input)
 {
     vector<int> remaining = countLetters(input);
-    printAnagramPhrases2Recur(NULL, this, "", remaining);
+    printAnagramPhrasesRecur(NULL, this, "", remaining);
 }
-void Anatree::printAnagramPhrases2Recur(Anatree *prevLocation,
+void Anatree::printAnagramPhrasesRecur(Anatree *prevLocation,
     Anatree *currLocation, string partSolution, vector<int> remaining)
 {
     if (currLocation == NULL || alreadyProcessed(currLocation, prevLocation))
@@ -188,7 +119,7 @@ void Anatree::printAnagramPhrases2Recur(Anatree *prevLocation,
         if (remaining[c] > 0) {
             vector<int> newRemaining = remaining;
             newRemaining[c]--;
-            printAnagramPhrases2Recur(prevLocation, currLocation->links[c],
+            printAnagramPhrasesRecur(prevLocation, currLocation->links[c],
                 partSolution, newRemaining);
             complete = false;
         }
@@ -198,26 +129,7 @@ void Anatree::printAnagramPhrases2Recur(Anatree *prevLocation,
         if (complete)
             cout << (partSolution + word) << endl;
         else
-            printAnagramPhrases2Recur(currLocation, this,
+            printAnagramPhrasesRecur(currLocation, this,
                 (partSolution + word + " "), remaining);
     }
-}
-
-void Anatree::printAnatree()
-{
-    printAnatreeRecur(this);
-}
-void Anatree::printAnatreeRecur(Anatree *a)
-{
-    if (a == NULL)
-        return;
-
-    if (a->words.size() >= 2) {
-        for (string word : a->words)
-            cout << word << "    ";
-        cout << endl;
-    }
-
-    for (Anatree *link : a->links)
-        printAnatreeRecur(link);
 }

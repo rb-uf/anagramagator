@@ -9,13 +9,11 @@
 #include <fstream>
 #include <cctype>
 #include "util.h"
-#include "brute.h"
 #include "filterAlg.h"
 #include "anatree.h"
 using namespace std;
 
 void loadDict(set<string>& dict);
-void printAnagramWords(string word, set<string> dict);
 
 int main(int argc, char const *argv[])
 {
@@ -29,7 +27,7 @@ int main(int argc, char const *argv[])
             findSolutions(input, dict);
     else
     	while (getline(cin, input))
-    		anatree.printAnagramPhrases2(input);
+    		anatree.printAnagramPhrases(input);
 
     return 0;
 }
@@ -49,17 +47,4 @@ void loadDict(set<string> &dict)
             word[i] = tolower(word[i]);
 		dict.emplace(word);
 	}
-}
-
-
-
-/* printAnagramWords: prints all words from dictionary that can be made only
-	from letters in given word */
-void printAnagramWords(string word, set<string> dict)
-{
-	vector<int> letters = countLetters(word);
-
-	for (string dictWord : dict)
-		if (containsAllLetters(letters, countLetters(dictWord)))
-			cout << dictWord << endl;
 }
