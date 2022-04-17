@@ -22,12 +22,12 @@ int main(int argc, char const *argv[])
     Anatree anatree(dict);
 
 	string input;
-    if (argc > 1 && string(argv[1]) == "old")
+    if (argc > 1 && string(argv[1]) == "anatree")
         while (getline(cin, input))
-            findSolutions(input, dict);
+    		anatree.printAnagramPhrases(input);
     else
     	while (getline(cin, input))
-    		anatree.printAnagramPhrases(input);
+            findSolutions(input, dict);
 
     return 0;
 }
