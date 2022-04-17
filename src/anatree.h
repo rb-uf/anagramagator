@@ -10,7 +10,10 @@
 #include <iostream>
 #include <string>
 #include <list>
+#include <set>
 #include <cctype>
+#include <climits>
+#include <algorithm>
 #include "util.h"
 using namespace std;
 
@@ -18,23 +21,30 @@ class Anatree
 {
 private:
     list<string> words;
+    string charList;
     vector<Anatree *> links;
 
-    Anatree();  /* for adding nodes internally */
+    Anatree(string charList);  /* for adding nodes internally */
     void addToAnatree(string word);
     void printAnatreeRecur(Anatree *a);
     void printAnagramPhrasesRecur(Anatree *currLocation,
         string partialSolution, vector<int> remaining);
+    void printAnagramPhrases2Recur(Anatree *prevLocation,
+        Anatree *currLocation, string partSolution, vector<int> remaining);
+    bool alreadyProcessed(Anatree *current, Anatree *mark);
 
 public:
-    Anatree(vector<string> &dict);
+    Anatree(set<string> &dict);
     void printAnagramWords(string word);
     void printAnatree();
     void printAnagramPhrases(string input);
+    void printAnagramPhrases2(string input);
 };
 
-Anatree::Anatree()
+
+Anatree::Anatree(string charList)
 {
+    this->charList = charList;
     links = vector<Anatree *>(26, NULL);
 }
 
@@ -50,14 +60,16 @@ void Anatree::addToAnatree(string word)
 
     Anatree *currentNode = this;
     vector<int> remaining = countLetters(word);
+    string charList = "";
 
     /* go through each letter of the alphabet */
     for (int i = 0; i < 26; ) {
         /* if <word> has this letter and it remains to be processed... */
         if (remaining[i] > 0) {
+            charList += (char) (i + 'a');
             /* (add new node if it does not already exist) */
             if (currentNode->links[i] == NULL)
-                currentNode->links[i] = new Anatree();
+                currentNode->links[i] = new Anatree(charList);
             /* ...go to that branch of the tree */
             currentNode = currentNode->links[i];
             remaining[i] -= 1;  /* and don't check this letter instance again */
@@ -74,9 +86,10 @@ void Anatree::addToAnatree(string word)
             return;
     }
     currentNode->words.emplace_front(word);
+    currentNode->charList = charList;
 }
 
-Anatree::Anatree(vector<string> &dict)
+Anatree::Anatree(set<string> &dict)
 {
     links = vector<Anatree *>(26, NULL);
 
@@ -146,6 +159,49 @@ void Anatree::printAnagramPhrasesRecur(Anatree *currLocation,
     }
 }
 
+bool Anatree::alreadyProcessed(Anatree *current, Anatree *mark)
+{
+    if (mark == NULL) {
+        return false;
+    } else if (current->charList.length() < mark->charList.length()) {
+        return false;
+    } else if (current->charList.length() > mark->charList.length()) {
+        return true;
+    } else {    // same length
+        return (current->charList.compare(mark->charList) < 0) ? true : false;
+    }
+}
+
+void Anatree::printAnagramPhrases2(string input)
+{
+    vector<int> remaining = countLetters(input);
+    printAnagramPhrases2Recur(NULL, this, "", remaining);
+}
+void Anatree::printAnagramPhrases2Recur(Anatree *prevLocation,
+    Anatree *currLocation, string partSolution, vector<int> remaining)
+{
+    if (currLocation == NULL || alreadyProcessed(currLocation, prevLocation))
+        return;
+
+    bool complete = true;
+    for (int c = 0; c < 26; c++) {
+        if (remaining[c] > 0) {
+            vector<int> newRemaining = remaining;
+            newRemaining[c]--;
+            printAnagramPhrases2Recur(prevLocation, currLocation->links[c],
+                partSolution, newRemaining);
+            complete = false;
+        }
+    }
+
+    for (string word : currLocation->words) {
+        if (complete)
+            cout << (partSolution + word) << endl;
+        else
+            printAnagramPhrases2Recur(currLocation, this,
+                (partSolution + word + " "), remaining);
+    }
+}
 
 void Anatree::printAnatree()
 {

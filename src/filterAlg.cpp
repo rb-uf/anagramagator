@@ -11,6 +11,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <set>
 #include <list>
 #include <iterator>
 #include "filterAlg.h"
@@ -36,10 +37,10 @@ struct word
 
 list<word *> filter(list<word *> &oldList, vector<int> remaining,
                         list<word *>::iterator &from, bool inclusive);
-void findSolutions(string input, vector<string> &dict);
+void findSolutions(string input, set<string> &dict);
 void findSolutionsRecur(solution partialSolution, list<word *> wordList);
 solution append(solution existingSolution, word wordToAdd);
-list<word *> initialWordList(string input, vector<string> &dict);
+list<word *> initialWordList(string input, set<string> &dict);
 bool compare_longer(word *w1, word *w2);
 
 
@@ -83,7 +84,7 @@ list<word *> filter(list<word *> &oldList, vector<int> remaining,
 }
 
 /* findSolutions: finds anagram solutions and prints them out */
-void findSolutions(string input, vector<string> &dict)
+void findSolutions(string input, set<string> &dict)
 {
     solution emptySolution;
     emptySolution.remaining = countLetters(input);
@@ -114,7 +115,7 @@ void findSolutionsRecur(solution partialSolution, list<word *> wordList)
         solution attempt = append(partialSolution, **iter);
         //cout << "DEBUG: attempt: " << attempt.s << endl;
         findSolutionsRecur(attempt,
-            filter(wordList, attempt.remaining, iter, true));
+            filter(wordList, attempt.remaining, iter, false));
     }
     //cout << "DEBUG: OK 2" << endl;
 }
@@ -137,14 +138,15 @@ solution append(solution existingSolution, word wordToAdd)
 
 /* initialWordList: construct and initial word list according to input string
     and given dictionary vector */
-list<word *> initialWordList(string input, vector<string> &dict)
+list<word *> initialWordList(string input, set<string> &dict)
 {
     list<word *> wordList;
     vector<int> inputLetterCount = countLetters(input);
 
     for (string s : dict) {
         /* ignore words with length = 1 or with an apostrophe */
-        if (s.length() > 2 && s.find("'") == string::npos) {
+        if (s.length() > 2 && s.find("'") == string::npos
+            && s.find("é") == string::npos) {
             vector<int> count = countLetters(s);
             if (containsAllLetters(inputLetterCount, count)) {
                 word *newWord = new word;
