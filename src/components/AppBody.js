@@ -9,11 +9,11 @@ function AppBody() {
     const [error, setError] = useState(false);
 
     const handleSelect = (event) => {
-        console.log(`Set Algorithm: ${event.target.value}`)
+        // console.log(`Set Algorithm: ${event.target.value}`)
         setAlgorithm(event.target.value); // bruteforce = Default and anatree = Optimized
     };
     const handleInput = (event) => {
-        console.log(event.target.value)
+        // console.log(event.target.value);
         setWord(event.target.value);
     };
     const onSubmit = (event) => {
@@ -23,7 +23,6 @@ function AppBody() {
             anagrams.push(word);
             setWord('');
             setAlgorithm('bruteforce');
-            setAnagrams([]);
         }
         else {
             setError(true);

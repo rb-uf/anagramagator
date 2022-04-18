@@ -1,38 +1,59 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
+import React, { useState, useEffect } from 'react';
+import { Box, Card, CardActions, CardContent, Button, Typography, CardActionArea, CardHeader } from '@mui/material';
+import axios from 'axios';
 
 
 export default function Anagram({word}) {
-    const href = `https://www.dictionary.com/browse/${word}`;
-  return (
-    <Button href={href} target='_blank'>
-        <Card sx={{ minWidth: 275, bgcolor: 'coral' }}>
-        <CardContent>
-            {/* <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-            Word of the Day
-            </Typography> */}
-            <Typography variant="h5" component="div">
-            {word.toUpperCase()}
-            </Typography>
-            {/* <Typography sx={{ mb: 1.5 }} color="text.secondary">
-            adjective
-            </Typography> */}
-            {/* <Typography variant="body2">
-            well meaning and kindly.
-            <br />
-            {'"a benevolent smile"'}
-            </Typography> */}
-        </CardContent>
-        <CardActions>
-            {/* <Button size="small" href={href}>Learn More</Button> */}
-        </CardActions>
-        </Card>
-    </Button>
+    const [definition, setDefinition] = useState('');
+    const [example, setExample] = useState('');
+    const [partOfSpeech, setPartOfSpeech] = useState('');
 
+    const href = `https://www.dictionary.com/browse/${word}`;
+
+    useEffect(() => {
+        const apiResponse = async() => {
+            const object = await axios.get(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+            const data = object.data;
+            const meaning = data[0]['meanings'][0];
+            const partOfSpeech = meaning['partOfSpeech'];
+            const definitions = meaning['definitions'];
+            const definition = definitions[0]['definition'];
+            const example = definitions[0]['example'];
+            setDefinition(definition);
+            setPartOfSpeech(partOfSpeech);
+            if(example) {
+                setExample(example);
+            }
+        };
+
+        apiResponse();
+    }, []);
+
+    const openDictionaryWebsite = (event) => {
+        window.open(href, '_blank');
+    }
+
+  return (
+    <Card sx={{ width: 300, height: '100%', bgcolor: '#F9522F', textAlign: 'start' }}>
+        <CardActionArea sx={{height: '100%'}} onClick={openDictionaryWebsite}>
+            <CardContent>
+                <Box sx={{ p: 2 }}>
+                    <Typography variant="h5" component="div">
+                        {word.toUpperCase()}
+                    </Typography>
+                    <Typography sx={{ mb: 1.5 }} color="text.secondary">
+                        {partOfSpeech}
+                    </Typography>
+                    <Typography variant="body2" sx={{ mb: 1.5 }}>
+                        {definition}
+                    </Typography>
+                    {/* <Typography variant='body2' color="text.secondary">
+                        {example === '' && <>No Example Found</>}
+                        {example !== '' && <>Example: "{example}"</>}
+                    </Typography>  TODO: Find best way to display */}
+                </Box>
+            </CardContent>
+        </CardActionArea>
+    </Card>
   );
 }
