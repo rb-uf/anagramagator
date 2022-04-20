@@ -5,7 +5,7 @@ An anagram finder. Created for COP3530 Project 3.
 
 ### Instructions for Linux:
 
-Enter "make" to compile. Requires g++.
+Enter ```make``` to compile. Requires g++.
 
 To run interactively:
 <br /> - Enter ```./anagram``` to run the program using the FilterAlg algorithm (default).
