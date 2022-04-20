@@ -9,7 +9,6 @@
 #include <vector>
 #include <string>
 #include <cctype>
-#include "util.h"
 using namespace std;
 
 /* countLetters: returns a vector with the count of each letter in given word;
